@@ -1,0 +1,10 @@
+Frequentist modeling is done
+    did Likelihood ratio test for absense of spatial dependence
+    AIC / BIC criterian done on those models
+
+Bayesian mdoeling 
+
+Are these estimates more accurate in urban areas, rural areas or at the national level?
+
+
+validating model againset DSD level poverty headcount
