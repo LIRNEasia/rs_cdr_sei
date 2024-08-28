@@ -1,0 +1,8 @@
+
+Random Forest Classifier with estimators: 1000
+Accuracy: 1.0
+Precision at 10%: 1.0
+Recall at 10%: 0.7262337662337662
+[[12060     0]
+ [    0  1925]]
+----------------------------------------
