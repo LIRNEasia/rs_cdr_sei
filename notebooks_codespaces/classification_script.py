@@ -42,38 +42,38 @@ data_shapefile.set_index("code_7", inplace=True)
 data_shapefile = data_shapefile.to_crs(epsg=3857)
 merged = data_frame.merge(data_shapefile, left_on=data_frame.index, right_on='code_7', how='inner')
 
-n_iterations = 10
+n_iterations = 1000
 results = []
 
 # 1. Sample 20% of the data for the testing and leaving it untouched
 
-df, test = train_test_split(merged, test_size=0.2, stratify=merged['dsd_name'], random_state= 42)
-test = filter_shapefile_columns(test)
+#df, test = train_test_split(merged, test_size=0.2, stratify=merged['dsd_name'], random_state= 42)
+#test = filter_shapefile_columns(test)
 
 
 for i in range(n_iterations):
 
     
-    # 2. Sample 20% for the validation, such that 60% from the complete dataset will be available for training
+    df, test = train_test_split(merged, test_size=0.4, stratify=merged['dsd_name'], random_state= 42)
 
-    train, val = train_test_split(df, test_size=0.25, stratify=df['dsd_name'], random_state=i)
+    val, test1 = train_test_split(test, test_size=0.5, stratify=test['dsd_name'], random_state=i)
 
-    train = filter_shapefile_columns(train)
+    df = filter_shapefile_columns(df)
     val = filter_shapefile_columns(val)
 
 
-    train_and_evaluate_rf(train, val, 1000)
+    train_and_evaluate_rf(df, val, 1000)
 
     print(f"Training the model, iteration: {i + 1}")
 
 
-performance = pd.read_csv('/lirneasia/projects/sei_mapping/notebooks_codespaces/output.csv', header=None)
-values = performance.mean()
+#performance = pd.read_csv('/lirneasia/projects/sei_mapping/notebooks_codespaces/output.csv', header=None)
+#values = performance.mean()
 
-print("Mean Values for Precision and Recall at Each 10% Increment:")
-for i, (key, value) in enumerate(values.items()):
-    metric = 'Precision' if i % 2 == 0 else 'Recall'
-    print(f"{key}: {metric} = {value:.2f}")
+#print("Mean Values for Precision and Recall at Each 10% Increment:")
+#for i, (key, value) in enumerate(values.items()):
+#    metric = 'Precision' if i % 2 == 0 else 'Recall'
+#    print(f"{key}: {metric} = {value:.2f}")
 
     
 

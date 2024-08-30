@@ -202,46 +202,44 @@ def filter_shapefile_columns(df):
 
 def train_and_evaluate_rf(df, val, n_estimators):
     
-    #training using df
+    #training using df,  would incremental or online learning suit?
     rf_classifier = RandomForestClassifier(n_estimators=n_estimators, random_state=42)
     rf_classifier.fit(df.drop(columns=["pc1"]), df["pc1"])
     
     #validating using val
-    predictions = rf_classifier.predict(val.drop(columns = ["pc1"]))
+    #predictions = rf_classifier.predict(val.drop(columns = ["pc1"]))
     pred_prob = rf_classifier.predict_proba(val.drop(columns = ["pc1"]))[:, 1] 
-    val['predictions'] = predictions
+    #val['predictions'] = predictions
     val['pred_prob'] = pred_prob
     
     # sorting by predictions to find the performance at different thresholds
 
     val = val.sort_values('pred_prob', ascending=False)
     
-    #n_label_positives = len(val[val['predictions'] == 1])    
-    row = []
+    n_label_positives = len(val[val['pc1'] == 1])    
     metrics = list()
 
-    for i in range(10, 101, 10):
+
+    for i in range(5, 101, 5):
     
         threshold = round((len(val)/100)*i)
 
         top_threshold = val.iloc[:threshold]
 
-        tp = len(top_threshold[(top_threshold['predictions'] == 1) & (top_threshold['pc1'] == 1)])  # Count of true positives
+        #tp = len(top_threshold[(top_threshold['predictions'] == 1) & (top_threshold['pc1'] == 1)])  # Count of true positives
         
-        fp = len(top_threshold[(top_threshold['predictions'] == 1) & (top_threshold['pc1'] == 0)])  # Count of false positives
+        #fp = len(top_threshold[(top_threshold['predictions'] == 1) & (top_threshold['pc1'] == 0)])  # Count of false positives
 
-        fn = len(top_threshold[(top_threshold['predictions'] == 0) & (top_threshold['pc1'] == 1)])  # Count of false negatives
+        #fn = len(top_threshold[(top_threshold['predictions'] == 0) & (top_threshold['pc1'] == 1)])  # Count of false negatives
 
         #precision    
-        precision = tp / (tp + fp) if (tp + fp) > 0 else 0
-        #precision = val.iloc[:threshold]['predictions'].mean()  # This is TP / (TP + FP)
+        #precision = tp / (tp + fp) if (tp + fp) > 0 else 0
+        
+        precision = top_threshold['pc1'].mean()  # This is TP / (TP + FP)
         
         #Recall
-        recall = tp / (tp + fn) if (tp + fn) > 0 else 0
-        #recall = val.iloc[:threshold]['predictions'].sum() / n_label_positives  # This is TP / (TP + FN)
-
-        row.append(round(precision, 2))
-        row.append(round(recall, 2))
+        #recall = tp / (tp + fn) if (tp + fn) > 0 else 0
+        recall = top_threshold['pc1'].sum() / n_label_positives  # This is TP / (TP + FN)
 
         d = dict()
         d['threshold'] = threshold
@@ -250,11 +248,12 @@ def train_and_evaluate_rf(df, val, n_estimators):
         metrics.append(d)
     
     metrics_df = pd.DataFrame(metrics)
+    metrics_df.to_csv('performance.csv', mode='a', header=False, index=False)
     #precision_recall_curve(metrics_df)
 
-    with open("output.csv", "a", newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(row)
+    #with open("output.csv", "a", newline='') as file:
+    #   writer = csv.writer(file)
+    #    writer.writerow(row)
 
 
 def precision_recall_curve(metrics_df):
