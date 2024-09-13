@@ -284,3 +284,17 @@ def precision_recall_curve(metrics_df):
 
     plt.savefig(file_path)
     plt.close()
+
+
+
+
+'''
+Precision (at a given threshold): Measures how many of the instances predicted as positive are actually positive. 
+    High precision indicates that there are fewer false positives.
+
+Recall (at a given threshold): Measures how many of the actual positive instances the model correctly identifies. 
+
+High recall indicates that the model captures most of the true positives but may also include more false positives.
+
+
+'''    
